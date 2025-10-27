@@ -1,0 +1,8 @@
+C:\Users\STASI\source\repos\wsb-project-kumulatywny\wsb\wsb\obj\Debug\wsb.csproj.AssemblyReference.cache
+C:\Users\STASI\source\repos\wsb-project-kumulatywny\wsb\wsb\obj\Debug\wsb.csproj.CoreCompileInputs.cache
+C:\Users\STASI\source\repos\wsb-project-kumulatywny\wsb\wsb\bin\Debug\wsb.exe.config
+C:\Users\STASI\source\repos\wsb-project-kumulatywny\wsb\wsb\bin\Debug\wsb.exe
+C:\Users\STASI\source\repos\wsb-project-kumulatywny\wsb\wsb\bin\Debug\wsb.pdb
+C:\Users\STASI\source\repos\wsb-project-kumulatywny\wsb\wsb\obj\Debug\wsb.exe
+C:\Users\STASI\source\repos\wsb-project-kumulatywny\wsb\wsb\obj\Debug\wsb.pdb
+C:\Users\STASI\source\repos\wsb-project-kumulatywny\wsb\wsb\obj\Debug\wsb.exe.config
