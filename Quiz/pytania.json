@@ -1,0 +1,32 @@
+﻿{
+  "quizTitle": "Quiz z programowania",
+  "questions": [
+    {
+      "tresc": "Które słowo kluczowe w C# służy do dziedziczenia klasy?",
+      "odpowiedzi": [
+        { "tresc": "inherits", "czyPoprawna": false },
+        { "tresc": "extends", "czyPoprawna": false },
+        { "tresc": "base", "czyPoprawna": false },
+        { "tresc": ":", "czyPoprawna": true }
+      ]
+    },
+    {
+      "tresc": "Które z poniższych to typy wartościowe w C#?",
+      "odpowiedzi": [
+        { "tresc": "int", "czyPoprawna": true },
+        { "tresc": "string", "czyPoprawna": false },
+        { "tresc": "class", "czyPoprawna": false },
+        { "tresc": "interface", "czyPoprawna": false }
+      ]
+    },
+    {
+      "tresc": "Co oznacza OOP?",
+      "odpowiedzi": [
+        { "tresc": "Object-Oriented Programming", "czyPoprawna": true },
+        { "tresc": "Overpowered Operator Pattern", "czyPoprawna": false },
+        { "tresc": "Only One Process", "czyPoprawna": false },
+        { "tresc": "Operation On Platform", "czyPoprawna": false }
+      ]
+    }
+  ]
+}
