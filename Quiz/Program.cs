@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 
 namespace SystemQuiz
 {
@@ -9,24 +11,27 @@ namespace SystemQuiz
         bool CzyPoprawna { get; set; }
     }
 
-    public interface IQuestion
+    public interface IQuestion<TAnswer> where TAnswer : IAnswer
     {
         string Tresc { get; set; }
-        List<IAnswer> Odpowiedzi { get; }
+        List<TAnswer> Odpowiedzi { get; }
 
-        void DodajOdpowiedz(IAnswer odp);
+        void DodajOdpowiedz(TAnswer odp);
         bool SprawdzOdpowiedz(int indeks);
         void Wyswietl();
     }
 
-    public interface IQuiz
+    public interface IQuiz<TQuestion, TAnswer>
+        where TQuestion : IQuestion<TAnswer>
+        where TAnswer : IAnswer
     {
         string Tytul { get; set; }
-        List<IQuestion> Pytania { get; }
+        List<TQuestion> Pytania { get; }
 
-        void DodajPytanie(IQuestion pytanie);
+        void DodajPytanie(TQuestion pytanie);
         void PrzeprowadzQuiz();
     }
+
     public class Odpowiedz : IAnswer
     {
         public string Tresc { get; set; }
@@ -38,33 +43,28 @@ namespace SystemQuiz
             CzyPoprawna = czyPoprawna;
         }
 
-        public override string ToString()
-        {
-            return Tresc;
-        }
+        public override string ToString() => Tresc;
     }
 
-    public class Pytanie : IQuestion
+    public class Pytanie<TAnswer> : IQuestion<TAnswer> where TAnswer : IAnswer
     {
         public string Tresc { get; set; }
-        public List<IAnswer> Odpowiedzi { get; private set; }
+        public List<TAnswer> Odpowiedzi { get; private set; }
 
         public Pytanie(string tresc)
         {
             Tresc = tresc;
-            Odpowiedzi = new List<IAnswer>();
+            Odpowiedzi = new List<TAnswer>();
         }
 
-        public void DodajOdpowiedz(IAnswer odp)
+        public void DodajOdpowiedz(TAnswer odp)
         {
             Odpowiedzi.Add(odp);
         }
 
         public bool SprawdzOdpowiedz(int indeks)
         {
-            if (indeks < 0 || indeks >= Odpowiedzi.Count)
-                return false;
-            return Odpowiedzi[indeks].CzyPoprawna;
+            return indeks >= 0 && indeks < Odpowiedzi.Count && Odpowiedzi[indeks].CzyPoprawna;
         }
 
         public void Wyswietl()
@@ -77,18 +77,20 @@ namespace SystemQuiz
         }
     }
 
-    public class Quiz : IQuiz
+    public class Quiz<TQuestion, TAnswer> : IQuiz<TQuestion, TAnswer>
+        where TQuestion : IQuestion<TAnswer>
+        where TAnswer : IAnswer
     {
         public string Tytul { get; set; }
-        public List<IQuestion> Pytania { get; private set; }
+        public List<TQuestion> Pytania { get; private set; }
 
         public Quiz(string tytul)
         {
             Tytul = tytul;
-            Pytania = new List<IQuestion>();
+            Pytania = new List<TQuestion>();
         }
 
-        public void DodajPytanie(IQuestion pytanie)
+        public void DodajPytanie(TQuestion pytanie)
         {
             Pytania.Add(pytanie);
         }
@@ -106,7 +108,7 @@ namespace SystemQuiz
                 Console.Write("Wybierz numer odpowiedzi: ");
                 string input = Console.ReadLine()!;
 
-                if (!string.IsNullOrEmpty(input) && int.TryParse(input, out int wybor))
+                if (int.TryParse(input, out int wybor))
                 {
                     if (Pytania[i].SprawdzOdpowiedz(wybor - 1))
                     {
@@ -125,39 +127,76 @@ namespace SystemQuiz
             }
 
             Console.WriteLine($"Twój wynik: {wynik}/{Pytania.Count}");
+            Console.WriteLine("\nDziękujemy za udział w quizie!");
         }
     }
+
+    public class QuizData
+    {
+        public string QuizTitle { get; set; }
+        public List<QuestionData> Questions { get; set; }
+    }
+
+    public class QuestionData
+    {
+        public string Tresc { get; set; }
+        public List<AnswerData> Odpowiedzi { get; set; }
+    }
+
+    public class AnswerData
+    {
+        public string Tresc { get; set; }
+        public bool CzyPoprawna { get; set; }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            IQuiz quiz = new Quiz("Quiz z programowania");
+            string jsonPath = Path.Combine(AppContext.BaseDirectory, "pytania.json");
 
-            IQuestion p1 = new Pytanie("Które słowo kluczowe w C# służy do dziedziczenia klasy?");
-            p1.DodajOdpowiedz(new Odpowiedz("inherits"));
-            p1.DodajOdpowiedz(new Odpowiedz("extends"));
-            p1.DodajOdpowiedz(new Odpowiedz("base"));
-            p1.DodajOdpowiedz(new Odpowiedz(":", true));
+            if (!File.Exists(jsonPath))
+            {
+                Console.WriteLine($"❌ Nie znaleziono pliku: {jsonPath}");
+                return;
+            }
 
-            IQuestion p2 = new Pytanie("Które z poniższych to typy wartościowe w C#?");
-            p2.DodajOdpowiedz(new Odpowiedz("int", true));
-            p2.DodajOdpowiedz(new Odpowiedz("string"));
-            p2.DodajOdpowiedz(new Odpowiedz("class"));
-            p2.DodajOdpowiedz(new Odpowiedz("interface"));
+            string json = File.ReadAllText(jsonPath);
 
-            IQuestion p3 = new Pytanie("Co oznacza OOP?");
-            p3.DodajOdpowiedz(new Odpowiedz("Object-Oriented Programming", true));
-            p3.DodajOdpowiedz(new Odpowiedz("Overpowered Operator Pattern"));
-            p3.DodajOdpowiedz(new Odpowiedz("Only One Process"));
-            p3.DodajOdpowiedz(new Odpowiedz("Operation On Platform"));
+            QuizData data;
+            try
+            {
+                data = JsonSerializer.Deserialize<QuizData>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Błąd podczas deserializacji JSON:");
+                Console.WriteLine(ex.Message);
+                return;
+            }
 
-            quiz.DodajPytanie(p1);
-            quiz.DodajPytanie(p2);
-            quiz.DodajPytanie(p3);
+            if (data == null || data.Questions == null)
+            {
+                Console.WriteLine("❌ Błąd podczas wczytywania danych z pliku JSON (pusty wynik).");
+                return;
+            }
+
+            var quiz = new Quiz<IQuestion<IAnswer>, IAnswer>(data.QuizTitle);
+
+            foreach (var q in data.Questions)
+            {
+                var pytanie = new Pytanie<IAnswer>(q.Tresc);
+                foreach (var a in q.Odpowiedzi)
+                {
+                    pytanie.DodajOdpowiedz(new Odpowiedz(a.Tresc, a.CzyPoprawna));
+                }
+                quiz.DodajPytanie(pytanie);
+            }
 
             quiz.PrzeprowadzQuiz();
-
-            Console.WriteLine("\nDziękujemy za udział w quizie!");
         }
     }
 }
