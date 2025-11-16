@@ -1,7 +1,7 @@
-﻿using SystemQuiz.Interfaces;
+﻿using QuizCore.Interfaces;
 using System.Collections.Generic;
 
-namespace SystemQuiz.Interfaces
+namespace QuizCore.Interfaces 
 {
     public interface IQuestion<TAnswer> where TAnswer : IAnswer
     {

@@ -1,9 +1,9 @@
-﻿using SystemQuiz.Serialization;
+﻿using QuizCore.Serialization;
 using System.IO;
 using System.Text.Json;
 using System.Xml.Serialization;
 
-namespace SystemQuiz.Serialization
+namespace QuizCore.Serialization
 {
     public static class QuizSerializer
     {

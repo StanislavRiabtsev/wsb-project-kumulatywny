@@ -1,10 +1,10 @@
-﻿using SystemQuiz.Serialization;
-using SystemQuiz.Models; 
-using SystemQuiz.Interfaces;
+﻿using QuizCore.Serialization;
+using QuizCore.Models; 
+using QuizCore.Interfaces;
 using System;
 using System.IO;
 
-namespace SystemQuiz
+namespace Quiz
 {
     class Program
     {

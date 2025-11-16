@@ -1,8 +1,8 @@
-﻿using SystemQuiz.Interfaces;
+﻿using QuizCore.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace SystemQuiz.Models
+namespace QuizCore.Models
 {
     public class Quiz<TQuestion, TAnswer> : IQuiz<TQuestion, TAnswer>
         where TQuestion : IQuestion<TAnswer>

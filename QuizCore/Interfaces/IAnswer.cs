@@ -1,4 +1,4 @@
-﻿namespace SystemQuiz.Interfaces
+﻿namespace QuizCore.Interfaces
 {
     public interface IAnswer
     {

@@ -1,9 +1,9 @@
-﻿using SystemQuiz.Interfaces;
-using SystemQuiz.Models;
-using SystemQuiz.Serialization;
+﻿using QuizCore.Interfaces;
+using QuizCore.Models;
+using QuizCore.Serialization;
 using System.Linq;
 
-namespace SystemQuiz.Serialization
+namespace QuizCore.Serialization
 {
     public static class QuizConverter
     {
