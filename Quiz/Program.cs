@@ -1,10 +1,10 @@
-﻿using SystemQuiz.Serialization;
-using SystemQuiz.Models; 
-using SystemQuiz.Interfaces;
+﻿using QuizCore.Serialization;
+using QuizCore.Models; 
+using QuizCore.Interfaces;
 using System;
 using System.IO;
 
-namespace SystemQuiz
+namespace Quiz
 {
     class Program
     {
@@ -15,7 +15,7 @@ namespace SystemQuiz
 
             if (!File.Exists(path))
             {
-                Console.WriteLine("❌ Plik nie istnieje!");
+                Console.WriteLine("Plik nie istnieje!");
                 return;
             }
 
@@ -27,7 +27,7 @@ namespace SystemQuiz
                 data = QuizSerializer.LoadFromXml(path);
             else
             {
-                Console.WriteLine("❌ Obsługiwane formaty: .json, .xml");
+                Console.WriteLine("Obsługiwane formaty: .json, .xml");
                 return;
             }
 
@@ -35,15 +35,15 @@ namespace SystemQuiz
 
             quiz.PrzeprowadzQuiz();
 
-            Console.WriteLine("\nCzy zapisać quiz do JSON i XML? (t/n)");
-            if (Console.ReadLine().ToLower() == "t")
+            Console.WriteLine("\nCzy zapisać quiz do JSON i XML? (tak/nie)");
+            if (Console.ReadLine().ToLower() == "tak")
             {
                 var saveData = QuizConverter.ConvertToData(quiz);
 
                 QuizSerializer.SaveToJson("zapisany_quiz.json", saveData);
                 QuizSerializer.SaveToXml("zapisany_quiz.xml", saveData);
 
-                Console.WriteLine("✓ Zapisano pliki: zapisany_quiz.json oraz zapisany_quiz.xml");
+                Console.WriteLine("Zapisano pliki: zapisany_quiz.json oraz zapisany_quiz.xml");
             }
         }
     }

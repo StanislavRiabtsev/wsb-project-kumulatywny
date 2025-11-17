@@ -1,6 +1,6 @@
-﻿using SystemQuiz.Interfaces;
+﻿using QuizCore.Interfaces;
 
-namespace SystemQuiz.Models
+namespace QuizCore.Models
 {
     public class Odpowiedz : IAnswer
     {

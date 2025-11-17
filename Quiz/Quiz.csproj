@@ -17,4 +17,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\QuizCore\QuizCore.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SystemQuiz.Serialization
+namespace QuizCore.Serialization
 {
     public class QuizData
     {
