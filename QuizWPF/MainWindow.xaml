@@ -1,68 +1,75 @@
 ﻿<Window x:Class="WPFQuiz.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Quiz" Height="400" Width="600"
+        Title="Quiz" Height="500" Width="600"
         Background="#FF2D2D30">
 
     <Grid>
+
         <StackPanel x:Name="StartPanel" 
                     HorizontalAlignment="Center" 
                     VerticalAlignment="Center" 
-                    TextBlock.TextAlignment="Center">
+                    Width="400">
 
-            <TextBlock Text="Wybierz plik quizu" 
+            <TextBlock Text="Wybierz plik LUB wyszukaj w bazie" 
                        FontSize="20" 
                        Margin="0 0 0 20" 
                        TextAlignment="Center"
                        Foreground="White"/>
 
-            <Button Content="Wczytaj Quiz" 
-                    Width="200" Height="40"
-                    HorizontalAlignment="Center"
-                    Background="#FF007ACC"
-                    Foreground="White"
-                    BorderBrush="Black"
+            <Button Content="Wczytaj z pliku (JSON/XML)" 
+                    Height="40" Margin="0 0 0 20"
+                    Background="#FF007ACC" Foreground="White"
                     Click="LoadQuiz_Click"/>
+
+            <Separator Margin="0 0 0 20"/>
+
+            <TextBlock Text="Wyszukiwarka Bazy Danych (LINQ):" Foreground="LightGray" Margin="0 0 0 5"/>
+
+            <Grid Margin="0 0 0 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="SearchBox" Height="30" FontSize="14" Padding="5"/>
+                <Button Grid.Column="1" Content="Szukaj" Width="80" Height="30" 
+                        Background="#FF5D5D5D" Foreground="White"
+                        Click="SearchDb_Click"/>
+            </Grid>
+
+            <ListBox x:Name="DbQuizList" Height="100" Background="White" 
+                     SelectionChanged="DbQuizList_SelectionChanged"
+                     DisplayMemberPath="Title"/>
         </StackPanel>
 
         <StackPanel x:Name="QuizPanel" Visibility="Collapsed"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
 
-            <TextBlock x:Name="QuestionText"
-                       FontSize="18" 
-                       Margin="0 0 0 20" 
-                       TextAlignment="Center"
-                       Foreground="White"/>
+            <TextBlock x:Name="QuestionText" FontSize="18" Margin="0 0 0 20" 
+                       TextAlignment="Center" Foreground="White"/>
 
-            <StackPanel x:Name="AnswersPanel" 
-                        Margin="0 0 0 20"
-                        HorizontalAlignment="Center"
-                        TextElement.Foreground="White"/>
+            <StackPanel x:Name="AnswersPanel" Margin="0 0 0 20"
+                        HorizontalAlignment="Center" TextElement.Foreground="White"/>
 
-            <Button Content="Dalej" 
-                    Width="200" Height="40"
-                    HorizontalAlignment="Center"
-                    Background="#FF007ACC"
-                    Foreground="White"
-                    BorderBrush="Black"
+            <Button Content="Dalej" Width="200" Height="40"
+                    Background="#FF007ACC" Foreground="White"
                     Click="NextQuestion_Click"/>
         </StackPanel>
 
         <StackPanel x:Name="ResultPanel" Visibility="Collapsed"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
 
-            <TextBlock x:Name="ResultText" 
-                       FontSize="24" 
-                       TextAlignment="Center"
-                       Foreground="White"
-                       Margin="0 0 0 20"/>
+            <TextBlock x:Name="ResultText" FontSize="24" TextAlignment="Center"
+                       Foreground="White" Margin="0 0 0 20"/>
 
-            <Button Content="Zapisz do Bazy Danych"
+            <Button Content="Zapisz ten wynik do Bazy"
                     Width="200" Height="40"
-                    Background="#28a745"
-                    Foreground="White"
-                    BorderBrush="Black"
+                    Background="#28a745" Foreground="White"
                     Click="SaveToDb_Click"/>
+
+            <Button Content="Wróć do menu" Margin="0 10 0 0"
+                    Width="200" Height="40"
+                    Click="Reset_Click"/>
         </StackPanel>
 
     </Grid>

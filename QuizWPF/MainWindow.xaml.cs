@@ -1,6 +1,7 @@
 ﻿using QuizCore;
 using QuizCore.Serialization;
-using QuizCore.Database; // Важно: подключили базу данных
+using QuizCore.Database;
+using QuizCore.Database.Entities; // Нужно для работы со списком
 using Microsoft.Win32;
 using System;
 using System.Windows;
@@ -19,6 +20,7 @@ namespace WPFQuiz
             InitializeComponent();
         }
 
+        // 1. Загрузка из файла
         private void LoadQuiz_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
@@ -27,7 +29,6 @@ namespace WPFQuiz
             if (dialog.ShowDialog() == true)
             {
                 string file = dialog.FileName;
-
                 try
                 {
                     if (file.EndsWith(".json"))
@@ -35,21 +36,69 @@ namespace WPFQuiz
                     else
                         _quizData = QuizSerializer.LoadFromXml(file);
 
-                    // Сброс состояния
-                    _currentQuestionIndex = 0;
-                    _score = 0;
-
-                    StartPanel.Visibility = Visibility.Collapsed;
-                    QuizPanel.Visibility = Visibility.Visible;
-                    ResultPanel.Visibility = Visibility.Collapsed;
-
-                    ShowQuestion();
+                    StartQuiz();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Błąd wczytywania pliku: " + ex.Message);
+                    MessageBox.Show("Błąd pliku: " + ex.Message);
                 }
             }
+        }
+
+        // 2. Поиск в БД (LINQ)
+        private void SearchDb_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var repo = new QuizRepository();
+                string searchText = SearchBox.Text;
+
+                // Вызов метода с LINQ запросом
+                var results = repo.SearchQuizzes(searchText);
+
+                DbQuizList.ItemsSource = results; // Привязка данных к списку
+
+                if (results.Count == 0)
+                    MessageBox.Show("Nie znaleziono quizów.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd bazy danych: " + ex.Message);
+            }
+        }
+
+        // 3. Выбор квиза из списка
+        private void DbQuizList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DbQuizList.SelectedItem is QuizEntity selectedQuizEntity)
+            {
+                try
+                {
+                    var repo = new QuizRepository();
+                    // Загружаем полный квиз (с вопросами) по ID
+                    _quizData = repo.GetQuizById(selectedQuizEntity.Id);
+
+                    StartQuiz();
+
+                    // Сброс выбора (чтобы можно было выбрать снова тот же)
+                    DbQuizList.SelectedItem = null;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Błąd ładowania quizu: " + ex.Message);
+                }
+            }
+        }
+
+        // Общий метод запуска
+        private void StartQuiz()
+        {
+            _currentQuestionIndex = 0;
+            _score = 0;
+            StartPanel.Visibility = Visibility.Collapsed;
+            ResultPanel.Visibility = Visibility.Collapsed;
+            QuizPanel.Visibility = Visibility.Visible;
+            ShowQuestion();
         }
 
         private void ShowQuestion()
@@ -77,7 +126,6 @@ namespace WPFQuiz
         private void NextQuestion_Click(object sender, RoutedEventArgs e)
         {
             int selected = -1;
-
             foreach (RadioButton rb in AnswersPanel.Children)
             {
                 if (rb.IsChecked == true)
@@ -100,7 +148,6 @@ namespace WPFQuiz
 
             if (_currentQuestionIndex >= _quizData.questions.Count)
             {
-                // Конец квиза
                 QuizPanel.Visibility = Visibility.Collapsed;
                 ResultPanel.Visibility = Visibility.Visible;
                 ResultText.Text = $"Twój wynik: {_score}/{_quizData.questions.Count}";
@@ -111,22 +158,26 @@ namespace WPFQuiz
             }
         }
 
-        // Логика сохранения в базу данных
         private void SaveToDb_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (_quizData != null)
-                {
-                    var repo = new QuizRepository();
-                    repo.AddQuiz(_quizData);
-                    MessageBox.Show("Sukces! Quiz został zapisany do bazy danych SQL.", "Informacja", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                var repo = new QuizRepository();
+                repo.AddQuiz(_quizData);
+                MessageBox.Show("Zapisano!");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Błąd zapisu do bazy: {ex.Message}\n{ex.InnerException?.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Błąd: " + ex.Message);
             }
+        }
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            ResultPanel.Visibility = Visibility.Collapsed;
+            StartPanel.Visibility = Visibility.Visible;
+            SearchBox.Text = "";
+            DbQuizList.ItemsSource = null;
         }
     }
 }

@@ -29,12 +29,22 @@ namespace QuizCore.Database
             context.Quizzes.Add(quizEntity);
             context.SaveChanges();
         }
+
         public List<QuizEntity> GetAllQuizzes()
         {
             using var context = new QuizDbContext();
             return context.Quizzes.ToList();
         }
 
+        public List<QuizEntity> SearchQuizzes(string searchText)
+        {
+            using var context = new QuizDbContext();
+
+            return context.Quizzes
+                .Where(q => q.Title.Contains(searchText))
+                .OrderBy(q => q.Title)
+                .ToList();
+        }
         public QuizData GetQuizById(int quizId)
         {
             using var context = new QuizDbContext();
@@ -59,27 +69,6 @@ namespace QuizCore.Database
                     }).ToList()
                 }).ToList()
             };
-        }
-
-        public void UpdateQuizTitle(int quizId, string newTitle)
-        {
-            using var context = new QuizDbContext();
-            var quiz = context.Quizzes.Find(quizId);
-            if (quiz != null)
-            {
-                quiz.Title = newTitle;
-                context.SaveChanges();
-            }
-        }
-        public void DeleteQuiz(int quizId)
-        {
-            using var context = new QuizDbContext();
-            var quiz = context.Quizzes.Find(quizId);
-            if (quiz != null)
-            {
-                context.Quizzes.Remove(quiz);
-                context.SaveChanges();
-            }
         }
     }
 }
