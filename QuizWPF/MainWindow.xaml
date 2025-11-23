@@ -5,7 +5,6 @@
         Background="#FF2D2D30">
 
     <Grid>
-
         <StackPanel x:Name="StartPanel" 
                     HorizontalAlignment="Center" 
                     VerticalAlignment="Center" 
@@ -38,7 +37,7 @@
             <StackPanel x:Name="AnswersPanel" 
                         Margin="0 0 0 20"
                         HorizontalAlignment="Center"
-                        Foreground="White"/>
+                        TextElement.Foreground="White"/>
 
             <Button Content="Dalej" 
                     Width="200" Height="40"
@@ -49,14 +48,21 @@
                     Click="NextQuestion_Click"/>
         </StackPanel>
 
-
         <StackPanel x:Name="ResultPanel" Visibility="Collapsed"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
 
             <TextBlock x:Name="ResultText" 
                        FontSize="24" 
                        TextAlignment="Center"
-                       Foreground="White"/>
+                       Foreground="White"
+                       Margin="0 0 0 20"/>
+
+            <Button Content="Zapisz do Bazy Danych"
+                    Width="200" Height="40"
+                    Background="#28a745"
+                    Foreground="White"
+                    BorderBrush="Black"
+                    Click="SaveToDb_Click"/>
         </StackPanel>
 
     </Grid>

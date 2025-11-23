@@ -1,6 +1,8 @@
 ﻿using QuizCore;
 using QuizCore.Serialization;
+using QuizCore.Database; // Важно: подключили базу данных
 using Microsoft.Win32;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,22 +28,35 @@ namespace WPFQuiz
             {
                 string file = dialog.FileName;
 
-                if (file.EndsWith(".json"))
-                    _quizData = QuizSerializer.LoadFromJson(file);
-                else
-                    _quizData = QuizSerializer.LoadFromXml(file);
+                try
+                {
+                    if (file.EndsWith(".json"))
+                        _quizData = QuizSerializer.LoadFromJson(file);
+                    else
+                        _quizData = QuizSerializer.LoadFromXml(file);
 
-                StartPanel.Visibility = Visibility.Collapsed;
-                QuizPanel.Visibility = Visibility.Visible;
+                    // Сброс состояния
+                    _currentQuestionIndex = 0;
+                    _score = 0;
 
-                ShowQuestion();
+                    StartPanel.Visibility = Visibility.Collapsed;
+                    QuizPanel.Visibility = Visibility.Visible;
+                    ResultPanel.Visibility = Visibility.Collapsed;
+
+                    ShowQuestion();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Błąd wczytywania pliku: " + ex.Message);
+                }
             }
         }
 
         private void ShowQuestion()
         {
-            var q = _quizData.questions[_currentQuestionIndex];
+            if (_quizData == null || _quizData.questions.Count == 0) return;
 
+            var q = _quizData.questions[_currentQuestionIndex];
             QuestionText.Text = q.tresc;
 
             AnswersPanel.Children.Clear();
@@ -55,7 +70,6 @@ namespace WPFQuiz
                     FontSize = 16,
                     Margin = new Thickness(0, 5, 0, 5)
                 };
-
                 AnswersPanel.Children.Add(rb);
             }
         }
@@ -86,14 +100,32 @@ namespace WPFQuiz
 
             if (_currentQuestionIndex >= _quizData.questions.Count)
             {
+                // Конец квиза
                 QuizPanel.Visibility = Visibility.Collapsed;
                 ResultPanel.Visibility = Visibility.Visible;
-
                 ResultText.Text = $"Twój wynik: {_score}/{_quizData.questions.Count}";
             }
             else
             {
                 ShowQuestion();
+            }
+        }
+
+        // Логика сохранения в базу данных
+        private void SaveToDb_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_quizData != null)
+                {
+                    var repo = new QuizRepository();
+                    repo.AddQuiz(_quizData);
+                    MessageBox.Show("Sukces! Quiz został zapisany do bazy danych SQL.", "Informacja", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Błąd zapisu do bazy: {ex.Message}\n{ex.InnerException?.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
