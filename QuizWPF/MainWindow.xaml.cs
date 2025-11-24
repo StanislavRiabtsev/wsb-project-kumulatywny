@@ -1,6 +1,9 @@
 ﻿using QuizCore;
 using QuizCore.Serialization;
+using QuizCore.Database;
+using QuizCore.Database.Entities;
 using Microsoft.Win32;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -25,23 +28,76 @@ namespace WPFQuiz
             if (dialog.ShowDialog() == true)
             {
                 string file = dialog.FileName;
+                try
+                {
+                    if (file.EndsWith(".json"))
+                        _quizData = QuizSerializer.LoadFromJson(file);
+                    else
+                        _quizData = QuizSerializer.LoadFromXml(file);
 
-                if (file.EndsWith(".json"))
-                    _quizData = QuizSerializer.LoadFromJson(file);
-                else
-                    _quizData = QuizSerializer.LoadFromXml(file);
-
-                StartPanel.Visibility = Visibility.Collapsed;
-                QuizPanel.Visibility = Visibility.Visible;
-
-                ShowQuestion();
+                    StartQuiz();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Błąd pliku: " + ex.Message);
+                }
             }
+        }
+
+        private void SearchDb_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var repo = new QuizRepository();
+                string searchText = SearchBox.Text;
+
+                var results = repo.SearchQuizzes(searchText);
+
+                DbQuizList.ItemsSource = results;
+
+                if (results.Count == 0)
+                    MessageBox.Show("Nie znaleziono quizów.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd bazy danych: " + ex.Message);
+            }
+        }
+
+        private void DbQuizList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DbQuizList.SelectedItem is QuizEntity selectedQuizEntity)
+            {
+                try
+                {
+                    var repo = new QuizRepository();
+                    _quizData = repo.GetQuizById(selectedQuizEntity.Id);
+
+                    StartQuiz();
+
+                    DbQuizList.SelectedItem = null;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Błąd ładowania quizu: " + ex.Message);
+                }
+            }
+        }
+        private void StartQuiz()
+        {
+            _currentQuestionIndex = 0;
+            _score = 0;
+            StartPanel.Visibility = Visibility.Collapsed;
+            ResultPanel.Visibility = Visibility.Collapsed;
+            QuizPanel.Visibility = Visibility.Visible;
+            ShowQuestion();
         }
 
         private void ShowQuestion()
         {
-            var q = _quizData.questions[_currentQuestionIndex];
+            if (_quizData == null || _quizData.questions.Count == 0) return;
 
+            var q = _quizData.questions[_currentQuestionIndex];
             QuestionText.Text = q.tresc;
 
             AnswersPanel.Children.Clear();
@@ -55,7 +111,6 @@ namespace WPFQuiz
                     FontSize = 16,
                     Margin = new Thickness(0, 5, 0, 5)
                 };
-
                 AnswersPanel.Children.Add(rb);
             }
         }
@@ -63,7 +118,6 @@ namespace WPFQuiz
         private void NextQuestion_Click(object sender, RoutedEventArgs e)
         {
             int selected = -1;
-
             foreach (RadioButton rb in AnswersPanel.Children)
             {
                 if (rb.IsChecked == true)
@@ -88,13 +142,34 @@ namespace WPFQuiz
             {
                 QuizPanel.Visibility = Visibility.Collapsed;
                 ResultPanel.Visibility = Visibility.Visible;
-
                 ResultText.Text = $"Twój wynik: {_score}/{_quizData.questions.Count}";
             }
             else
             {
                 ShowQuestion();
             }
+        }
+
+        private void SaveToDb_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var repo = new QuizRepository();
+                repo.AddQuiz(_quizData);
+                MessageBox.Show("Zapisano!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd: " + ex.Message);
+            }
+        }
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            ResultPanel.Visibility = Visibility.Collapsed;
+            StartPanel.Visibility = Visibility.Visible;
+            SearchBox.Text = "";
+            DbQuizList.ItemsSource = null;
         }
     }
 }
