@@ -1,7 +1,7 @@
 ﻿using QuizCore;
 using QuizCore.Serialization;
 using QuizCore.Database;
-using QuizCore.Database.Entities; // Нужно для работы со списком
+using QuizCore.Database.Entities;
 using Microsoft.Win32;
 using System;
 using System.Windows;
@@ -20,7 +20,6 @@ namespace WPFQuiz
             InitializeComponent();
         }
 
-        // 1. Загрузка из файла
         private void LoadQuiz_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
@@ -45,7 +44,6 @@ namespace WPFQuiz
             }
         }
 
-        // 2. Поиск в БД (LINQ)
         private void SearchDb_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -53,10 +51,9 @@ namespace WPFQuiz
                 var repo = new QuizRepository();
                 string searchText = SearchBox.Text;
 
-                // Вызов метода с LINQ запросом
                 var results = repo.SearchQuizzes(searchText);
 
-                DbQuizList.ItemsSource = results; // Привязка данных к списку
+                DbQuizList.ItemsSource = results;
 
                 if (results.Count == 0)
                     MessageBox.Show("Nie znaleziono quizów.");
@@ -67,7 +64,6 @@ namespace WPFQuiz
             }
         }
 
-        // 3. Выбор квиза из списка
         private void DbQuizList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DbQuizList.SelectedItem is QuizEntity selectedQuizEntity)
@@ -75,12 +71,10 @@ namespace WPFQuiz
                 try
                 {
                     var repo = new QuizRepository();
-                    // Загружаем полный квиз (с вопросами) по ID
                     _quizData = repo.GetQuizById(selectedQuizEntity.Id);
 
                     StartQuiz();
 
-                    // Сброс выбора (чтобы можно было выбрать снова тот же)
                     DbQuizList.SelectedItem = null;
                 }
                 catch (Exception ex)
@@ -89,8 +83,6 @@ namespace WPFQuiz
                 }
             }
         }
-
-        // Общий метод запуска
         private void StartQuiz()
         {
             _currentQuestionIndex = 0;
