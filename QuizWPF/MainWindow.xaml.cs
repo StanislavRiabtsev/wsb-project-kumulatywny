@@ -164,7 +164,7 @@ namespace WPFQuiz
             }
         }
 
-        private void Reset_Click(object sender, RoutedEventArgs e)
+        private void Reset_Click(object sender, RoutedEventArgs e)  
         {
             ResultPanel.Visibility = Visibility.Collapsed;
             StartPanel.Visibility = Visibility.Visible;

@@ -1,0 +1,38 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Список квизов";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4">Dostępne Quizy</h1>
+    <p class="lead">Wybierz quiz, aby sprawdzić swoją wiedzę!</p>
+</div>
+
+<div class="container">
+    <div class="row">
+        @if (Model.Quizzes.Count == 0)
+        {
+            <div class="alert alert-warning">
+                Baza danych jest pusta. Uruchom aplikację WPF lub Konsolę, aby dodać quizy!
+            </div>
+        }
+        else
+        {
+            @foreach (var quiz in Model.Quizzes)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@quiz.Title</h5>
+                            <p class="card-text text-muted">ID: @quiz.Id</p>
+                        </div>
+                        <div class="card-footer bg-white border-top-0">
+                            <a asp-page="/Solve" asp-route-id="@quiz.Id" class="btn btn-primary w-100">Rozwiąż Quiz</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

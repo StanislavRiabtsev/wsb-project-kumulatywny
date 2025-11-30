@@ -1,5 +1,5 @@
 ﻿using QuizCore.Serialization;
-using QuizCore.Models; 
+using QuizCore.Models;
 using QuizCore.Interfaces;
 using System;
 using System.IO;

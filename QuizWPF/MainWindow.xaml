@@ -62,7 +62,7 @@
             <TextBlock x:Name="ResultText" FontSize="24" TextAlignment="Center"
                        Foreground="White" Margin="0 0 0 20"/>
 
-            <Button Content="Zapisz ten wynik do Bazy"
+            <Button Content="Zapisz  do Bazy"
                     Width="200" Height="40"
                     Background="#28a745" Foreground="White"
                     Click="SaveToDb_Click"/>
