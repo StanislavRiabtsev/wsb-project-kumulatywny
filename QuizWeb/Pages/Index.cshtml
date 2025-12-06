@@ -1,7 +1,7 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Список квизов";
+    ViewData["Title"] = "Dostępne Quizy";
 }
 
 <div class="text-center mb-5">
@@ -28,7 +28,15 @@
                             <p class="card-text text-muted">ID: @quiz.Id</p>
                         </div>
                         <div class="card-footer bg-white border-top-0">
-                            <a asp-page="/Solve" asp-route-id="@quiz.Id" class="btn btn-primary w-100">Rozwiąż Quiz</a>
+                            <div class="d-grid gap-2">
+                                <a asp-page="/Solve" asp-route-id="@quiz.Id" class="btn btn-primary">
+                                    Wersja Razor
+                                </a>
+
+                                <a asp-page="/SolveBlazor" asp-route-id="@quiz.Id" class="btn btn-success">
+                                    Wersja Blazor
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
