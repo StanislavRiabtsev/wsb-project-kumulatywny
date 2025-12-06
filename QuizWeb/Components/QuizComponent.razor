@@ -1,0 +1,96 @@
+﻿@using QuizCore.Serialization
+@using QuizCore.Database
+@inject QuizRepository Repository
+
+<div class="card shadow">
+    @if (CurrentQuiz == null)
+    {
+        <div class="card-body">
+            <p>Ładowanie...</p>
+        </div>
+    }
+    else if (IsFinished)
+    {
+        <div class="card-body text-center bg-light">
+            <h2 class="text-success">Koniec!</h2>
+            <h3 class="display-4">Twój wynik: @Score / @CurrentQuiz.questions.Count</h3>
+            <a href="/Index" class="btn btn-outline-primary mt-3">Wróć do menu</a>
+        </div>
+    }
+    else
+    {
+        <div class="card-header bg-success text-white">
+            <h4>Blazor Mode: @CurrentQuiz.quizTitle</h4>
+        </div>
+        <div class="card-body">
+            @{ var q = CurrentQuiz.questions[currentQuestionIndex]; }
+            
+            <h5>Pytanie @(currentQuestionIndex + 1): @q.tresc</h5>
+            <hr />
+
+            @for (int i = 0; i < q.odpowiedzi.Count; i++)
+            {
+                var index = i; 
+                
+                <div class="form-check p-2 border rounded mb-2 @(selectedAnswer == index ? "bg-light border-success" : "")"
+                     @onclick="() => SelectAnswer(index)"
+                     style="cursor: pointer">
+                     
+                    <input class="form-check-input" type="radio" 
+                           name="answers" id="ans_@i"
+                           checked="@(selectedAnswer == index)"
+                           readonly /> <label class="form-check-label w-100" style="cursor: pointer">
+                        @q.odpowiedzi[i].tresc
+                    </label>
+                </div>
+            }
+            
+            <button class="btn btn-success w-100 mt-3" 
+                    @onclick="NextQuestion" 
+                    disabled="@(selectedAnswer == -1)">
+                @(currentQuestionIndex == CurrentQuiz.questions.Count - 1 ? "Zakończ" : "Dalej")
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int QuizId { get; set; }
+
+    private QuizData CurrentQuiz;
+    private int currentQuestionIndex = 0;
+    private int Score = 0;
+    private bool IsFinished = false;
+    private int selectedAnswer = -1;
+
+    protected override void OnInitialized()
+    {
+        CurrentQuiz = Repository.GetQuizById(QuizId);
+    }
+
+    private void SelectAnswer(int index)
+    {
+        selectedAnswer = index;
+    }
+
+    private void NextQuestion()
+    {
+        if (selectedAnswer == -1) return;
+
+        if (CurrentQuiz.questions[currentQuestionIndex].odpowiedzi[selectedAnswer].czyPoprawna)
+        {
+            Score++;
+        }
+
+        if (currentQuestionIndex < CurrentQuiz.questions.Count - 1)
+        {
+            currentQuestionIndex++;
+            selectedAnswer = -1;
+        }
+        else
+        {
+            IsFinished = true;
+        }
+    }
+}

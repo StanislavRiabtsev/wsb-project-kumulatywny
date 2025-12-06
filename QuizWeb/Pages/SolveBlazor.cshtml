@@ -1,0 +1,15 @@
+@page "{id:int}"
+@using QuizWeb.Components
+@{
+    ViewData["Title"] = "Blazor Quiz";
+}
+
+<div class="container mt-4">
+    <div class="alert alert-info">
+        <strong>Tryb interaktywny (Blazor).</strong>
+    </div>
+
+    <component type="typeof(QuizComponent)" 
+               render-mode="Server" 
+               param-QuizId="@int.Parse(RouteData.Values["id"].ToString())" />
+</div>
