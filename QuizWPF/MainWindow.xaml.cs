@@ -23,17 +23,14 @@ namespace WPFQuiz
         private void LoadQuiz_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
-            dialog.Filter = "Quiz files|*.json;*.xml";
+            dialog.Filter = "JSON files|*.json";
 
             if (dialog.ShowDialog() == true)
             {
                 string file = dialog.FileName;
                 try
                 {
-                    if (file.EndsWith(".json"))
-                        _quizData = QuizSerializer.LoadFromJson(file);
-                    else
-                        _quizData = QuizSerializer.LoadFromXml(file);
+                    _quizData = QuizSerializer.LoadFromJson(file);
 
                     StartQuiz();
                 }
@@ -83,6 +80,7 @@ namespace WPFQuiz
                 }
             }
         }
+
         private void StartQuiz()
         {
             _currentQuestionIndex = 0;
@@ -164,7 +162,7 @@ namespace WPFQuiz
             }
         }
 
-        private void Reset_Click(object sender, RoutedEventArgs e)  
+        private void Reset_Click(object sender, RoutedEventArgs e)
         {
             ResultPanel.Visibility = Visibility.Collapsed;
             StartPanel.Visibility = Visibility.Visible;
