@@ -10,7 +10,7 @@ namespace Quiz
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Podaj nazwę pliku do wczytania (JSON lub XML):");
+            Console.WriteLine("Podaj nazwę pliku do wczytania (JSON):");
             string path = Console.ReadLine();
 
             if (!File.Exists(path))
@@ -20,14 +20,13 @@ namespace Quiz
             }
 
             QuizData data;
-
             if (path.EndsWith(".json"))
+            {
                 data = QuizSerializer.LoadFromJson(path);
-            else if (path.EndsWith(".xml"))
-                data = QuizSerializer.LoadFromXml(path);
+            }
             else
             {
-                Console.WriteLine("Obsługiwane formaty: .json, .xml");
+                Console.WriteLine("Obsługiwany format: .json");
                 return;
             }
 
@@ -35,15 +34,13 @@ namespace Quiz
 
             quiz.PrzeprowadzQuiz();
 
-            Console.WriteLine("\nCzy zapisać quiz do JSON i XML? (tak/nie)");
+            Console.WriteLine("\nCzy zapisać quiz do JSON? (tak/nie)");
             if (Console.ReadLine().ToLower() == "tak")
             {
                 var saveData = QuizConverter.ConvertToData(quiz);
 
                 QuizSerializer.SaveToJson("zapisany_quiz.json", saveData);
-                QuizSerializer.SaveToXml("zapisany_quiz.xml", saveData);
-
-                Console.WriteLine("Zapisano pliki: zapisany_quiz.json oraz zapisany_quiz.xml");
+                Console.WriteLine("Zapisano plik: zapisany_quiz.json");
             }
         }
     }
