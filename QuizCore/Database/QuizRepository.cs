@@ -3,6 +3,7 @@ using QuizCore.Database.Entities;
 using QuizCore.Serialization;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuizCore.Database
 {
@@ -35,6 +36,11 @@ namespace QuizCore.Database
             using var context = new QuizDbContext();
             return context.Quizzes.ToList();
         }
+        public async Task<List<QuizEntity>> GetAllQuizzesAsync()
+        {
+            using var context = new QuizDbContext();
+            return await context.Quizzes.ToListAsync();
+        }
 
         public List<QuizEntity> SearchQuizzes(string searchText)
         {
@@ -45,6 +51,7 @@ namespace QuizCore.Database
                 .OrderBy(q => q.Title)
                 .ToList();
         }
+
         public QuizData GetQuizById(int quizId)
         {
             using var context = new QuizDbContext();
@@ -56,6 +63,25 @@ namespace QuizCore.Database
 
             if (quizEntity == null) return null;
 
+            return MapEntityToData(quizEntity);
+        }
+        public async Task<QuizData> GetQuizByIdAsync(int quizId)
+        {
+            using var context = new QuizDbContext();
+
+            var quizEntity = await context.Quizzes
+                .Include(q => q.Questions)
+                .ThenInclude(q => q.Answers)
+                .FirstOrDefaultAsync(q => q.Id == quizId);
+
+            if (quizEntity == null) return null;
+
+            return MapEntityToData(quizEntity);
+        }
+
+        // Pomocnicza metoda prywatna, żeby nie kopiować kodu mapowania dwa razy
+        private QuizData MapEntityToData(QuizEntity quizEntity)
+        {
             return new QuizData
             {
                 quizTitle = quizEntity.Title,
