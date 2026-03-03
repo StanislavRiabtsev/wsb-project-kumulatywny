@@ -51,7 +51,6 @@ namespace QuizCore.Database
                 .OrderBy(q => q.Title)
                 .ToList();
         }
-
         public QuizData GetQuizById(int quizId)
         {
             using var context = new QuizDbContext();
@@ -79,7 +78,6 @@ namespace QuizCore.Database
             return MapEntityToData(quizEntity);
         }
 
-        // Pomocnicza metoda prywatna, żeby nie kopiować kodu mapowania dwa razy
         private QuizData MapEntityToData(QuizEntity quizEntity)
         {
             return new QuizData
